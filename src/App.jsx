@@ -2,10 +2,11 @@ import { motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as api from './api/productos';
 import ProductList from './components/ProductList';
+import ProductLookup from './components/ProductLookup';
 import ProductModal from './components/ProductModal';
 import Stats from './components/Stats';
 import Toasts from './components/Toasts';
-import { IconMoon, IconPlus, IconRefresh, IconSearch, IconSun } from './components/Icons';
+import { IconHash, IconMoon, IconPlus, IconRefresh, IconSearch, IconSun } from './components/Icons';
 
 const ease = [0.16, 1, 0.3, 1];
 
@@ -20,6 +21,7 @@ export default function App() {
   const [busqueda, setBusqueda] = useState('');
   const [estado, setEstado] = useState('conectando'); // conectando | ok | error
   const [modal, setModal] = useState({ abierto: false, producto: null });
+  const [consultaAbierta, setConsultaAbierta] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [tema, setTema] = useState(temaInicial);
   const peticion = useRef(0);
@@ -62,6 +64,8 @@ export default function App() {
   const abrirCrear = () => setModal({ abierto: true, producto: null });
   const abrirEditar = (producto) => setModal({ abierto: true, producto });
   const cerrarModal = useCallback(() => setModal((m) => ({ ...m, abierto: false })), []);
+  const cerrarConsulta = useCallback(() => setConsultaAbierta(false), []);
+  const editarDesdeConsulta = (producto) => { setConsultaAbierta(false); abrirEditar(producto); };
 
   const guardar = async (datos) => {
     if (modal.producto) {
@@ -123,6 +127,9 @@ export default function App() {
             <IconSearch />
             <input value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por nombre…" />
           </label>
+          <button className="icon-btn icon-btn--bordered" onClick={() => setConsultaAbierta(true)} aria-label="Consultar por ID" title="Consultar por ID">
+            <IconHash />
+          </button>
           <button className="icon-btn icon-btn--bordered" onClick={() => cargar(busqueda)} aria-label="Recargar" title="Recargar">
             <IconRefresh className={cargando ? 'spin' : ''} />
           </button>
@@ -147,6 +154,7 @@ export default function App() {
         <footer className="footer">backendUpb · Express + PostgreSQL</footer>
       </main>
 
+      <ProductLookup abierto={consultaAbierta} onCerrar={cerrarConsulta} onEditar={editarDesdeConsulta} />
       <ProductModal abierto={modal.abierto} producto={modal.producto} onCerrar={cerrarModal} onGuardar={guardar} />
       <Toasts toasts={toasts} />
     </div>

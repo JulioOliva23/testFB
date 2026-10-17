@@ -32,3 +32,6 @@ export const actualizarProducto = (id, datos) =>
 
 export const eliminarProducto = (id) =>
   request(`/api/productos/${id}`, { method: 'DELETE' });
+
+export const obtenerProducto = (id) =>
+  request(`/api/productos/${encodeURIComponent(String(id).trim())}`);
